@@ -12,34 +12,34 @@ let colors = [
 ];
 
 function setup() {
-  createCanvas(windowWidth, windowHeight); // ✅ 画面いっぱい
+  createCanvas(windowWidth, windowHeight);
   clear();
   noStroke();
 
   currentColor = colors[0];
 
-  // 消しゴムモード切り替えボタン（左上）
-  eraseButton = createButton("🖌 描くモード");
-  eraseButton.position(10, 10);
-  eraseButton.mousePressed(toggleEraseMode);
+  eraseButton = createButton("🖌 おえかき");
+  eraseButton.position(16, 16);
+  eraseButton.style("font-size", "20px");
+  eraseButton.style("padding", "12px 18px");
+  eraseButton.style("border-radius", "12px");
+  eraseButton.mousePressed(toggleEraseMode); // ✅ これが必要
 
-  // ✅ パレットをボタンの横に横並び（背景なし）
   layoutPalette();
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  layoutPalette(); // ✅ 画面サイズが変わっても再配置
+  layoutPalette();
 }
 
 function layoutPalette() {
   colorButtons = [];
 
-  // ボタンの右側から始める（ボタン幅ぶん余白を取る）
-  const startX = 180;   // ← ボタンが被るなら増やす
-  const y = 22;         // 上部に固定
-  const r = 14;         // パレット丸の半径
-  const gap = 10;       // 丸同士の間隔
+  const startX = 240;
+  const y = 44;
+  const r = 26;
+  const gap = 20;
 
   for (let i = 0; i < colors.length; i++) {
     let x = startX + i * (r * 2 + gap);
@@ -49,11 +49,10 @@ function layoutPalette() {
 
 function toggleEraseMode() {
   eraseMode = !eraseMode;
-  eraseButton.html(eraseMode ? "🧽 消しゴムモード" : "🖌 描くモード");
+  eraseButton.html(eraseMode ? "🧽 消しゴム" : "🖌 おえかき");
 }
 
 function draw() {
-  // UI（パレット）だけ毎フレーム描画
   drawColorButtons();
 
   if (mouseIsPressed) {
@@ -112,7 +111,7 @@ function eraseBrush() {
   noErase();
 }
 
-// 🎨 パレット描画（背景なし）
+// 🎨 パレット描画（背景なし）✅ 関数として復活させる
 function drawColorButtons() {
   drawingContext.shadowBlur = 0;
 
@@ -121,10 +120,10 @@ function drawColorButtons() {
 
     if (currentColor === b.color) {
       stroke(0);
-      strokeWeight(2);
+      strokeWeight(4);
     } else {
-      stroke(80, 80, 80, 120);
-      strokeWeight(1);
+      stroke(100, 100, 100, 120);
+      strokeWeight(2);
     }
 
     fill(b.color);
