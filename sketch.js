@@ -18,12 +18,15 @@ function setup() {
 
   currentColor = colors[0];
 
+  // ✅ ボタン：大きく＆上に余白（スマホで押しやすい）
   eraseButton = createButton("🖌 おえかき");
-  eraseButton.position(16, 16);
-  eraseButton.style("font-size", "20px");
-  eraseButton.style("padding", "12px 18px");
-  eraseButton.style("border-radius", "12px");
-  eraseButton.mousePressed(toggleEraseMode); // ✅ これが必要
+  eraseButton.position(20, 24);              // ← 上に余白
+  eraseButton.style("font-size", "26px");    // ← 文字大
+  eraseButton.style("padding", "18px 24px"); // ← 押しやすい
+  eraseButton.style("border-radius", "16px");
+  eraseButton.style("border", "2px solid rgba(0,0,0,0.25)");
+  eraseButton.style("background", "rgba(255,255,255,0.9)");
+  eraseButton.mousePressed(toggleEraseMode);
 
   layoutPalette();
 }
@@ -33,23 +36,49 @@ function windowResized() {
   layoutPalette();
 }
 
-function layoutPalette() {
-  colorButtons = [];
-
-  const startX = 240;
-  const y = 44;
-  const r = 26;
-  const gap = 20;
-
-  for (let i = 0; i < colors.length; i++) {
-    let x = startX + i * (r * 2 + gap);
-    colorButtons.push({ x, y, r, color: colors[i] });
-  }
-}
-
 function toggleEraseMode() {
   eraseMode = !eraseMode;
   eraseButton.html(eraseMode ? "🧽 消しゴム" : "🖌 おえかき");
+}
+
+function layoutPalette() {
+  colorButtons = [];
+
+  // ==== パレット設定（大きめ + 間隔広め）====
+  const r = 34;     // 円の半径（直径68px）
+  const gapY = 32;  // 縦の間隔（もっと広げた）
+  const gapX = 44;  // 列間の間隔（もっと広げた）
+  const cols = 2;   // 2列
+  const total = colors.length;
+  const rows = Math.ceil(total / cols);
+
+  // ==== ボタンの位置・サイズをDOMから取得して「真下」に置く ====
+  const bx = parseFloat(eraseButton.position().x) || 20;
+  const by = parseFloat(eraseButton.position().y) || 24;
+  const bw = eraseButton.elt ? eraseButton.elt.offsetWidth : 220;
+  const bh = eraseButton.elt ? eraseButton.elt.offsetHeight : 80;
+
+  const marginUnderButton = 26; // ボタンの下の余白（ここ増やすともっと離れる）
+
+  // パレット全体の横幅（2列ぶん）
+  const paletteW = cols * (r * 2) + gapX;
+
+  // ボタンの中央にパレットを揃えて、ボタンの真下に配置
+  const startX = bx + (bw - paletteW) / 2 + r;  // ellipse中心基準なので +r
+  const startY = by + bh + marginUnderButton + r;
+
+  let idx = 0;
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      if (idx >= total) return;
+
+      const x = startX + col * (r * 2 + gapX);
+      const y = startY + row * (r * 2 + gapY);
+
+      colorButtons.push({ x, y, r, color: colors[idx] });
+      idx++;
+    }
+  }
 }
 
 function draw() {
@@ -98,12 +127,12 @@ function getWatercolorColor(baseHex) {
   return color(r, g, b, alpha);
 }
 
-// 🧽 消しゴム（線）
+// 🧽 消しゴム
 function eraseBrush() {
   erase(255);
   drawingContext.shadowBlur = 0;
 
-  strokeWeight(40);
+  strokeWeight(50); // ← スマホ用に少し太く
   stroke(0);
   noFill();
   line(pmouseX, pmouseY, mouseX, mouseY);
@@ -111,7 +140,7 @@ function eraseBrush() {
   noErase();
 }
 
-// 🎨 パレット描画（背景なし）✅ 関数として復活させる
+// 🎨 パレット描画（背景なし）
 function drawColorButtons() {
   drawingContext.shadowBlur = 0;
 
@@ -120,10 +149,10 @@ function drawColorButtons() {
 
     if (currentColor === b.color) {
       stroke(0);
-      strokeWeight(4);
+      strokeWeight(5);  // ← 選択中を分かりやすく
     } else {
-      stroke(100, 100, 100, 120);
-      strokeWeight(2);
+      stroke(80, 80, 80, 140);
+      strokeWeight(3);
     }
 
     fill(b.color);
